@@ -1,0 +1,222 @@
+****************************************************************************************************************************
+                            
+****************************************************************************************************************************
+
+##################################
+#    Part One: Evaluation Q&A    #
+##################################
+
+---
+
+### Q: Differences between Rocky and Debian?
+**A**:
+* Rocky Linux is mainly for businesses and servers, focusing on stability and long-term support.
+* Rocky Linux is less customizable out-of-the-box and is intended to provide a consistent, enterprise-ready system.
+
+* Debian is for everyone—from regular users to developers—and is used for both personal computers and servers.
+* Debian is highly customizable, letting users adjust the system for specific needs or preferences.
+
+### Q: Why Debian?
+**A**: It's easier to install and configure than CentOS (and I haven’t used CentOS before).
+
+---
+
+### Q: What is a Virtual Machine (VM)?
+**A**: A Virtual Machine (VM) is a compute resource that uses software instead of a physical computer to run programs and deploy apps.
+Each virtual machine runs its own operating system and functions separately from the other VMs, even when they are all running on the same host.  
+**Example**: You can run a virtual MacOS machine on a physical PC.
+
+---
+
+### Q: What is the purpose of a Virtual Machine?
+**A**: VMs are used to accommodate different levels of processing power needs, run software that requires a different operating system, or test applications in a safe, sandboxed environment.
+
+---
+
+### Q: How does a Virtual Machine work?
+**A**: A Virtual Machine (VM) is a software-based emulation of a physical computer that allows you to run an operating system (OS) inside another OS. Think of it like creating a "computer" within your actual computer. Each VM has its own virtual hardware (CPU, memory, storage) and runs its own operating system, just like a real computer. This allows you to run different operating systems on the same physical machine, like running Windows on a Mac or running Linux on a Windows PC.
+
+
+---
+
+### Q: What’s the difference between `aptitude` and `apt`?
+**A**:  
+- **Aptitude** is a high-level package manager with a more user-friendly interface.  
+- **APT** (Advanced Packaging Tool) is a lower-level package manager that provides the tools needed by other higher-level package managers (like `aptitude`).
+
+---
+
+### Q: What is AppArmor?
+**A**: AppArmor ("Application Armor") is a Linux kernel security module that allows the system administrator to restrict programs' capabilities with per-program profiles.  
+
+---
+
+### Q: What is SSH?SSH (Secure Shell) is a network protocol that allows users (particularly system administrators) to securely access a computer over an unsecured network.  
+**A**: SSH (Secure Shell) is a network protocol that allows users (particularly system administrators) to securely access a computer over an unsecured network.  
+
+### Q: What is UFW?
+**A**: UFW (Uncomplicated Firewall) is a tool used to manage a Linux firewall. It provides an easy way to configure the iptables firewall (which controls incoming and outgoing network traffic) through simple commands.
+
+###: How to check what OS im using
+cat /etc/os-release | grep PRETTY_NAME
+---
+### Checks:
+**** UFW: sudo UFW status
+**** SSH: sudo service ssh status
+
+### changing users and connecting to terminal in SSH
+****: su -
+
+
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+| **How to Set Up Password Policies**          |
+|                                              |
+| 1) Modify the password expiration settings:  |
+|    $ sudo nano /etc/login.defs               | <- Open the login.defs file to set password expiration rules. |
+|    Change the following values:              |
+|    - PASS_MAX_DAYS 30                        | <- Maximum number of days a password can be used before expiring. |
+|    - PASS_MIN_DAYS 2                         | <- Minimum number of days a user must wait before changing their password. |
+|    - PASS_WARN_AGE 7                         | <- Number of days before the password expires when a user is warned. |
+|                                              |
+| 2) Set password strength rules:              |
+|    $ sudo nano /etc/pam.d/common-password    | <- Open the PAM password configuration file. |
+|    Add the following rules:                  |
+|    - minlen = 10                             | <- Minimum password length (10 characters). |
+|    - ucredit = -1                            | <- Require at least one uppercase letter. |
+|    - dcredit = -1                            | <- Require at least one digit. |
+|    - lcredit = -1                            | <- Require at least one lowercase letter. |
+|    - maxrepeat = 3                           | <- Limit the number of repeated characters (3 max). |
+|    - reject_username                         | <- Prevent the password from containing the username. |
+|    - difok = 7                               | <- New password must differ from the old password by at least 7 characters. |
+|    - enforce_for_root                        | <- Enforce these rules for the root user as well. |
+|                                              |
+| 3) Verify user compliance with the policy:   |
+|    $ sudo chage -l username                  | <- Check password expiration and compliance for the user. |
+|                                              |
+| 4) Modify user settings if needed:           |
+|    $ sudo chage -m <time> username           | <- Set the minimum number of days before password change. |
+|    $ sudo chage -M <time> username           | <- Set the maximum number of days before password expiration. |
+|                                              |
+\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+| **You have to create a new user here.**     |
+| $ sudo adduser username                     |  <- Create new user (answer yes/no prompts)
+| $ sudo chage -l username                    |  <- Verify password expiration info for new user
+| $ sudo adduser username sudo                |  <- Add user to `sudo` group
+| $ sudo adduser username user42              |  <- Assign new user to `user42` group
+\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+### Q: How does your script work?
+
+#!/bin/bash
+
+# ============================
+# System Information Script
+# ============================
+
+# 1. **Architecture Information**
+# Get the architecture details of the system (e.g., x86_64, Linux kernel version, etc.)
+arch=$(uname -a)
+
+# 2. **CPU Information**
+# Get the number of virtual CPUs (vCPUs) by counting the "processor" entries in /proc/cpuinfo
+cpuv=$(grep "processor" /proc/cpuinfo | wc -l)
+
+# 3. **RAM Usage**
+# Total RAM in MB
+ram_total=$(free --mega | awk '$1 == "Mem:" {print $2}')
+# Used RAM in MB
+ram_use=$(free --mega | awk '$1 == "Mem:" {print $3}')
+# Percentage of RAM used
+ram_percent=$(free --mega | awk '$1 == "Mem:" {printf("%.2f"), $3/$2*100}')
+
+# 4. **Disk Usage**
+# Total disk space (excluding /boot) in GB
+disk_total=$(df -m | grep "/dev/" | grep -v "/boot" | awk '{disk_t += $2} END {printf ("%.1fGb\n"), disk_t/1024}')
+# Used disk space in MB (excluding /boot)
+disk_use=$(df -m | grep "/dev/" | grep -v "/boot" | awk '{disk_u += $3} END {print disk_u}')
+# Percentage of disk used
+disk_percent=$(df -m | grep "/dev/" | grep -v "/boot" | awk '{disk_u += $3} {disk_t+= $2} END {printf("%d"), disk_u/disk_t*100}')
+
+# 5. **CPU Load**
+# Get the current CPU load (from vmstat), calculating how much CPU is being used
+cpul=$(vmstat 1 2 | tail -1 | awk '{printf $15}')
+# Calculate the percentage of CPU being used
+cpu_op=$(expr 100 - $cpul)
+# Format the CPU load percentage
+cpu_fin=$(printf "%.1f" $cpu_op)
+
+# 6. **Last Boot Information**
+# Get the date and time of the last system boot
+lb=$(who -b | awk '$1 == "system" {print $3 " " $4}')
+
+# 7. **LVM (Logical Volume Management) Usage**
+# Check if LVM is being used on the system by looking for "lvm" in the output of lsblk
+lvmu=$(if [ $(lsblk | grep "lvm" | wc -l) -gt 0 ]; then echo yes; else echo no; fi)
+
+# 8. **TCP Connections**
+# Count the number of established TCP connections
+tcpc=$(ss -ta | grep ESTAB | wc -l)
+
+# 9. **User Log Information**
+# Count the number of users currently logged in (by counting the number of users listed)
+ulog=$(users | wc -w)
+
+# 10. **Network Information**
+# Get the system's IP address
+ip=$(hostname -I)
+# Get the MAC address of the network interface
+mac=$(ip link | grep "link/ether" | awk '{print $2}')
+
+# 11. **Sudo Usage**
+# Count the number of sudo commands run on the system by searching the journal logs
+cmnd=$(journalctl _COMM=sudo | grep COMMAND | wc -l)
+
+# ============================
+# Display the Information via `wall`
+# ============================
+# This will broadcast the gathered system information to all logged-in users
+
+wall "  Architecture: $arch
+        CPU physical: $cpuf
+        vCPU: $cpuv
+        Memory Usage: $ram_use/${ram_total}MB ($ram_percent%)
+        Disk Usage: $disk_use/${disk_total} ($disk_percent%)
+        CPU load: $cpu_fin%
+        Last boot: $lb
+        LVM use: $lvmu
+        Connections TCP: $tcpc ESTABLISHED
+        User log: $ulog
+        Network: IP $ip ($mac)
+        Sudo: $cmnd cmd"
+ 
+### Hot to Start/Stop the crontab
+***Stop: sudo /etc/init.d/cron stop
+***Start: sudo /etc/init.d/cron start
+---------------------------------------------------------------------------------------------------------------------------------------
+
+##################################
+#    Part Two: What to check?    #
+##################################
+
+|*****************************************|
+| 1) `lsblk`                              |  <- Check disk partitions
+| 2) `sudo aa-status`                     |  <- Check AppArmor status
+| 3) `getent group sudo`                  |  <- View users in the `sudo` group
+| 4) `getent group user42`                |  <- View users in the `user42` group
+| 5) `sudo service ssh status`            |  <- Check SSH service status
+| 6) `sudo ufw status`                    |  <- Check UFW (Uncomplicated Firewall) status
+| 7) `ssh username@ipaddress -p 4242`     |  <- Connect to VM via SSH from your host machine
+| 8) `nano /etc/sudoers.d/<filename>`     |  <- Edit sudo configuration (use `ls /etc/sudoers.d` to list available files)
+| 9) `nano /etc/login.defs`               |  <- Check password expiration policy
+| 10) `nano /etc/pam.d/common-password`   |  <- Configure password policy
+| 11) `sudo crontab -l`                   |  <- List cron jobs for the root user
+|*****************************************|
+
+---
+
+### How to Change the Hostname
+$ sudo nano /etc/hostname  # Edit the hostname file
