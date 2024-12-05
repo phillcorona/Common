@@ -1,0 +1,2 @@
+First line with newline.
+Second line with newline.

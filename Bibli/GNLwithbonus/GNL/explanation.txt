@@ -1,0 +1,61 @@
+/*
+** Utility Functions Overview for get_next_line
+**
+** 1. ft_memcpy
+**    Purpose: Copies memory from a source to a destination.
+**    Usage:
+**      - Used in ft_strjoin_and_free to copy strings while creating a new concatenated string.
+**
+** 2. ft_strlen_until
+**    Purpose: Calculates the length of a string up to a specific character or the null terminator ('\0').
+**    Usage:
+**      - Determines the length of a line in ft_extract_line (up to '\n').
+**      - Computes the length of strings in ft_strjoin_and_free.
+**
+** 3. ft_strdup_len
+**    Purpose: Duplicates a string up to a given length.
+**    Usage:
+**      - Creates the extracted line in ft_extract_line.
+**      - Copies remaining data from the buffer after extracting the line.
+**
+** 4. ft_strchr
+**    Purpose: Searches for the first occurrence of a character in a string.
+**    Usage:
+**      - Checks if a newline ('\n') exists in the buffer in ft_read_to_buffer.
+**
+** 5. ft_strjoin_and_free
+**    Purpose: Concatenates two strings and frees the first string to avoid memory leaks.
+**    Usage:
+**      - Appends new data read from the file descriptor to the existing buffer in ft_read_to_buffer.
+**
+** Additional Helper Functions
+**
+** char *ft_extract_line
+**    Purpose: Extracts a single line from the buffer.
+**    Parameters:
+**      - buffer (char **): A pointer to the static buffer holding the file's data.
+**    Behavior:
+**      - Finds the length of the line (up to '\n') using ft_strlen_until.
+**      - Allocates memory for the line using ft_strdup_len.
+**      - Allocates memory for the remaining buffer using ft_strdup_len.
+**      - Updates the buffer to retain any data after the extracted line.
+**    Returns:
+**      - A string containing the line, or NULL in case of errors.
+**
+** char *ft_read_to_buffer
+**    Purpose: Reads data from the file descriptor into the buffer until a newline is found or EOF is reached.
+**    Parameters:
+**      - fd (int): The file descriptor to read from.
+**      - buffer (char *): The existing buffer holding previous data (can be NULL).
+**    Behavior:
+**      - Allocates temporary memory for the read data.
+**      - Reads chunks of size BUFFER_SIZE from the file descriptor.
+**      - Appends the read data to the buffer using ft_strjoin_and_free.
+**      - Stops when a newline ('\n') is found or EOF is reached.
+**    Returns:
+**      - The updated buffer with the read data, or NULL in case of errors or EOF.
+**
+** I updated get_next_line to handle multiple file descriptors by using a static array where each file descriptor gets its own buffer.
+** This way, the function keeps track of where it left off for each file separately.
+** I also added checks to ensure the file descriptor is valid and cleaned up buffers when they are no longer needed.
+*/

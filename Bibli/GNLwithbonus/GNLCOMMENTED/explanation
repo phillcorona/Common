@@ -1,0 +1,85 @@
+# Project Defense: `get_next_line`
+
+## 1. Project Overview
+
+The goal of this project was to create a function named `get_next_line` that reads a line from a file descriptor.
+
+### Requirements:
+- Implement a function that reads a line from a file descriptor.
+- The function should return a line with the newline character included unless it's the last line.
+- If no more data is available or an error occurs, the function should return `NULL`.
+- The function should handle edge cases such as files without a newline at the end.
+- The buffer size for reading should be defined by a macro called `BUFFER_SIZE`.
+
+### Function Prototype:
+`char *get_next_line(int fd);`
+
+---
+
+## 2. How It Works
+
+### `get_next_line` Function
+
+The function reads chunks of data from the file descriptor into a static buffer until a newline or the end of the file is encountered.
+
+Once a newline is detected, the function processes the buffer and returns the line up to and including the newline.
+
+The function can be called repeatedly to read subsequent lines.
+
+### Key Functions:
+- **Reading into a buffer**: A helper function reads data into a buffer until a newline or end of file is reached.
+- **Extracting a line**: A helper function processes the buffer and extracts the next line.
+- **String length**: A function calculates the length of a string up to a specified character.
+- **String duplication**: A function duplicates parts of a string to handle buffer contents.
+- **String joining**: A helper function joins two strings together, freeing the first one.
+
+---
+
+## 3. File Structure
+
+The project contains:
+
+- **Main file**: Contains the `get_next_line` function.
+- **Utility functions file**: Contains helper functions for reading, extracting, and handling strings.
+- **Header file**: Declares all functions used in the project.
+
+---
+
+## 4. Expected Output
+
+The `get_next_line` function reads lines from the file and returns them one by one.
+
+1. Returns the first line with a newline.
+2. Returns subsequent lines.
+3. Returns `NULL` when there are no more lines.
+
+---
+
+## 5. Conclusion
+
+The `get_next_line` project involved handling file input/output operations, memory management, and static variables.
+
+By implementing this function, we gained experience in file reading, buffer management, and handling edge cases.
+
+---
+
+## 6. Bonus Explanation
+
+In the bonus part, we used `FD_MAX` to optimize handling multiple file descriptors and memory management.
+
+### What is `FD_MAX`?
+`FD_MAX` defines the maximum number of file descriptors the program can handle at once. It uses an array of static buffers indexed by file descriptors (`static char *buffer[FD_MAX]`), allowing concurrent file reading without data overlap.
+
+### Bonus Improvements:
+1. **Multiple File Handling**: The program handles multiple files simultaneously with individual buffers.
+2. **Efficient Buffer Management**: It reduces redundant reads and allocations for better performance.
+
+The bonus task improved the performance of `get_next_line` for multiple files, reducing system calls and improving memory efficiency.
+
+---
+
+## 7. Bonus Conclusion
+
+The bonus task optimized `get_next_line` by allowing concurrent handling of multiple file descriptors. Using `FD_MAX` improved buffer management and system call efficiency.
+
+This part reinforced our understanding of resource management and optimization in real-world applications.
